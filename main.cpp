@@ -1,308 +1,300 @@
-#include <Windows.h>
-
-#include <iostream>
-
 #include "binary_processor.h"
+#include <iostream>
+#include <locale>
+#include <clocale>
+#include <io.h>       
+#include <fcntl.h>    
 
 using namespace std;
 
-// ‘ÛÌÍˆËˇ ‰Îˇ ÛÒÚ‡ÌÓ‚ÍË ÛÒÒÍÓÈ ÎÓÍ‡ÎË
+// –§—É–Ω–∫—Ü–∏—è –¥–ª—è —É—Å—Ç–∞–Ω–æ–≤–∫–∏ —Ä—É—Å—Å–∫–æ–π –ª–æ–∫–∞–ª–∏
 void SetRussianLocale() {
-  SetConsoleOutputCP(1251);
-  SetConsoleCP(1251);
-  setlocale(LC_ALL, "Russian");
+    system("chcp 65001 > nul");  // –£—Å—Ç–∞–Ω–∞–≤–ª–∏–≤–∞–µ–º –∫–æ–¥–æ–≤—É—é —Å—Ç—Ä–∞–Ω–∏—Ü—É UTF-8
+    setlocale(LC_ALL, "ru_RU.UTF-8");
 }
 
+
 void ShowMenu() {
-  cout << "\n=== √À¿¬ÕŒ≈ Ã≈Õﬁ ===" << endl;
-  cout << "1. –‡·ÓÚ‡ Ò ·ËÌ‡Ì˚ÏË ˜ËÒÎÓ‚˚ÏË ‰‡ÌÌ˚ÏË («‡‰‡ÌËˇ 1 Ë 2)" << endl;
-  cout << "2. –‡·ÓÚ‡ Ò ·‡„‡ÊÓÏ («‡‰‡ÌËÂ 3)" << endl;
-  cout
-      << "3. –‡·ÓÚ‡ Ò ÚÂÍÒÚÓ‚˚ÏË ‰‡ÌÌ˚ÏË - ÔÓ Ó‰ÌÓÏÛ ˜ËÒÎÛ ‚ ÒÚÓÍÂ («‡‰‡ÌËÂ 4)"
-      << endl;
-  cout
-      << "4. –‡·ÓÚ‡ Ò ÚÂÍÒÚÓ‚˚ÏË ‰‡ÌÌ˚ÏË - ÌÂÒÍÓÎ¸ÍÓ ˜ËÒÂÎ ‚ ÒÚÓÍÂ («‡‰‡ÌËÂ 5)"
-      << endl;
-  cout << "5. –‡·ÓÚ‡ Ò ÚÂÍÒÚÓ‚˚ÏË ‰‡ÌÌ˚ÏË - ÒÚÓÍË («‡‰‡ÌËÂ 6)" << endl;
-  cout << "0. ¬˚ıÓ‰" << endl;
-  cout << "¬˚·Ó: ";
+    cout << "\n=== –ì–õ–ê–í–ù–û–ï –ú–ï–ù–Æ ===" << endl;
+    cout << "1. –†–∞–±–æ—Ç–∞ —Å –±–∏–Ω–∞—Ä–Ω—ã–º–∏ —á–∏—Å–ª–æ–≤—ã–º–∏ –¥–∞–Ω–Ω—ã–º–∏ (–ó–∞–¥–∞–Ω–∏—è 1 –∏ 2)" << endl;
+    cout << "2. –†–∞–±–æ—Ç–∞ —Å –±–∞–≥–∞–∂–æ–º (–ó–∞–¥–∞–Ω–∏–µ 3)" << endl;
+    cout << "3. –†–∞–±–æ—Ç–∞ —Å —Ç–µ–∫—Å—Ç–æ–≤—ã–º–∏ –¥–∞–Ω–Ω—ã–º–∏ - –ø–æ –æ–¥–Ω–æ–º—É —á–∏—Å–ª—É –≤ —Å—Ç—Ä–æ–∫–µ (–ó–∞–¥–∞–Ω–∏–µ 4)" << endl;
+    cout << "4. –†–∞–±–æ—Ç–∞ —Å —Ç–µ–∫—Å—Ç–æ–≤—ã–º–∏ –¥–∞–Ω–Ω—ã–º–∏ - –Ω–µ—Å–∫–æ–ª—å–∫–æ —á–∏—Å–µ–ª –≤ —Å—Ç—Ä–æ–∫–µ (–ó–∞–¥–∞–Ω–∏–µ 5)" << endl;
+    cout << "5. –†–∞–±–æ—Ç–∞ —Å —Ç–µ–∫—Å—Ç–æ–≤—ã–º–∏ –¥–∞–Ω–Ω—ã–º–∏ - —Å—Ç—Ä–æ–∫–∏ (–ó–∞–¥–∞–Ω–∏–µ 6)" << endl;
+    cout << "0. –í—ã—Ö–æ–¥" << endl;
+    cout << "–í—ã–±–æ—Ä: ";
 }
 
 void NumbersMenu() {
-  string filename;
-  cout << "¬‚Â‰ËÚÂ ËÏˇ Ù‡ÈÎ‡ ‰Îˇ ˜ËÒÎÓ‚˚ı ‰‡ÌÌ˚ı: ";
-  cin >> filename;
+    string filename;
+    cout << "–í–≤–µ–¥–∏—Ç–µ –∏–º—è —Ñ–∞–π–ª–∞ –¥–ª—è —á–∏—Å–ª–æ–≤—ã—Ö –¥–∞–Ω–Ω—ã—Ö: ";
+    cin >> filename;
 
-  while (true) {
-    cout << "\n=== Ã≈Õﬁ ◊»—ÀŒ¬€’ ƒ¿ÕÕ€’ ===" << endl;
-    cout << "1. «‡ÔÓÎÌËÚ¸ Ù‡ÈÎ ÒÎÛ˜‡ÈÌ˚ÏË ˜ËÒÎ‡ÏË" << endl;
-    cout << "2. œÓÍ‡Á‡Ú¸ ‰ÂÒˇÚË˜ÌÓÂ ÒÓ‰ÂÊËÏÓÂ" << endl;
-    cout << "3. «‡‰‡ÌËÂ 1 - Ô‡˚ ÔÓÚË‚ÓÔÓÎÓÊÌ˚ı ˜ËÒÂÎ" << endl;
-    cout << "4. «‡‰‡ÌËÂ 2 - Ó·‡·ÓÚÍ‡ Ï‡ÚËˆ˚" << endl;
-    cout << "5. —ÓÁ‰‡Ú¸ ÚÂÒÚÓ‚˚È Ù‡ÈÎ" << endl;
-    cout << "0. Õ‡Á‡‰" << endl;
-    cout << "¬˚·Ó: ";
+    while (true) {
+        cout << "\n=== –ú–ï–ù–Æ –ß–ò–°–õ–û–í–´–• –î–ê–ù–ù–´–• ===" << endl;
+        cout << "1. –ó–∞–ø–æ–ª–Ω–∏—Ç—å —Ñ–∞–π–ª —Å–ª—É—á–∞–π–Ω—ã–º–∏ —á–∏—Å–ª–∞–º–∏" << endl;
+        cout << "2. –ü–æ–∫–∞–∑–∞—Ç—å –¥–µ—Å—è—Ç–∏—á–Ω–æ–µ —Å–æ–¥–µ—Ä–∂–∏–º–æ–µ" << endl;
+        cout << "3. –ó–∞–¥–∞–Ω–∏–µ 1 - –ø–∞—Ä—ã –ø—Ä–æ—Ç–∏–≤–æ–ø–æ–ª–æ–∂–Ω—ã—Ö —á–∏—Å–µ–ª" << endl;
+        cout << "4. –ó–∞–¥–∞–Ω–∏–µ 2 - –æ–±—Ä–∞–±–æ—Ç–∫–∞ –º–∞—Ç—Ä–∏—Ü—ã" << endl;
+        cout << "5. –°–æ–∑–¥–∞—Ç—å —Ç–µ—Å—Ç–æ–≤—ã–π —Ñ–∞–π–ª" << endl;
+        cout << "0. –ù–∞–∑–∞–¥" << endl;
+        cout << "–í—ã–±–æ—Ä: ";
 
-    int choice;
-    cin >> choice;
+        int choice;
+        cin >> choice;
 
-    if (choice == 0) break;
+        if (choice == 0) break;
 
-    switch (choice) {
-      case 1: {
-        int count, min_val, max_val;
-        cout << " ÓÎË˜ÂÒÚ‚Ó ˜ËÒÂÎ: ";
-        cin >> count;
-        cout << "ÃËÌËÏÛÏ: ";
-        cin >> min_val;
-        cout << "Ã‡ÍÒËÏÛÏ: ";
-        cin >> max_val;
-        BinaryProcessor::FillWithRandomNumbers(filename, count, min_val,
-                                               max_val);
-        break;
-      }
-      case 2:
-        BinaryProcessor::DisplayNumbers(filename);
-        break;
-      case 3:
-        BinaryProcessor::Task1CountOppositePairs(filename);
-        break;
-      case 4:
-        BinaryProcessor::Task2MatrixProcessing(filename);
-        break;
-      case 5:
-        BinaryProcessor::CreateTestNumbersFile(filename);
-        break;
-      default:
-        cout << "ÕÂ‚ÂÌ˚È ‚˚·Ó!" << endl;
+        switch (choice) {
+        case 1: {
+            int count, min_val, max_val;
+            cout << "–ö–æ–ª–∏—á–µ—Å—Ç–≤–æ —á–∏—Å–µ–ª: ";
+            cin >> count;
+            cout << "–ú–∏–Ω–∏–º—É–º: ";
+            cin >> min_val;
+            cout << "–ú–∞–∫—Å–∏–º—É–º: ";
+            cin >> max_val;
+            BinaryProcessor::FillWithRandomNumbers(filename, count, min_val, max_val);
+            break;
+        }
+        case 2:
+            BinaryProcessor::DisplayNumbers(filename);
+            break;
+        case 3:
+            BinaryProcessor::Task1CountOppositePairs(filename);
+            break;
+        case 4:
+            BinaryProcessor::Task2MatrixProcessing(filename);
+            break;
+        case 5:
+            BinaryProcessor::CreateTestNumbersFile(filename);
+            break;
+        default:
+            cout << "–ù–µ–≤–µ—Ä–Ω—ã–π –≤—ã–±–æ—Ä!" << endl;
+        }
     }
-  }
 }
 
 void LuggageMenu() {
-  string filename;
-  cout << "¬‚Â‰ËÚÂ ËÏˇ Ù‡ÈÎ‡ ‰Îˇ ‰‡ÌÌ˚ı Ó ·‡„‡ÊÂ: ";
-  cin >> filename;
+    string filename;
+    cout << "–í–≤–µ–¥–∏—Ç–µ –∏–º—è —Ñ–∞–π–ª–∞ –¥–ª—è –¥–∞–Ω–Ω—ã—Ö –æ –±–∞–≥–∞–∂–µ: ";
+    cin >> filename;
 
-  while (true) {
-    cout << "\n=== Ã≈Õﬁ ¡¿√¿∆¿ ===" << endl;
-    cout << "1. «‡ÔÓÎÌËÚ¸ Ù‡ÈÎ ÒÎÛ˜‡ÈÌ˚ÏË ‰‡ÌÌ˚ÏË" << endl;
-    cout << "2. œÓÍ‡Á‡Ú¸ ÒÓ‰ÂÊËÏÓÂ Ù‡ÈÎ‡" << endl;
-    cout << "3. «‡‰‡ÌËÂ 3 - ‡ÁÌËˆ‡ Ï‡ÒÒ" << endl;
-    cout << "4. —ÓÁ‰‡Ú¸ ÚÂÒÚÓ‚˚È Ù‡ÈÎ" << endl;
-    cout << "0. Õ‡Á‡‰" << endl;
-    cout << "¬˚·Ó: ";
+    while (true) {
+        cout << "\n=== –ú–ï–ù–Æ –ë–ê–ì–ê–ñ–ê ===" << endl;
+        cout << "1. –ó–∞–ø–æ–ª–Ω–∏—Ç—å —Ñ–∞–π–ª —Å–ª—É—á–∞–π–Ω—ã–º–∏ –¥–∞–Ω–Ω—ã–º–∏" << endl;
+        cout << "2. –ü–æ–∫–∞–∑–∞—Ç—å —Å–æ–¥–µ—Ä–∂–∏–º–æ–µ —Ñ–∞–π–ª–∞" << endl;
+        cout << "3. –ó–∞–¥–∞–Ω–∏–µ 3 - —Ä–∞–∑–Ω–∏—Ü–∞ –º–∞—Å—Å" << endl;
+        cout << "4. –°–æ–∑–¥–∞—Ç—å —Ç–µ—Å—Ç–æ–≤—ã–π —Ñ–∞–π–ª" << endl;
+        cout << "0. –ù–∞–∑–∞–¥" << endl;
+        cout << "–í—ã–±–æ—Ä: ";
 
-    int choice;
-    cin >> choice;
+        int choice;
+        cin >> choice;
 
-    if (choice == 0) break;
+        if (choice == 0) break;
 
-    switch (choice) {
-      case 1: {
-        int passenger_count;
-        cout << " ÓÎË˜ÂÒÚ‚Ó Ô‡ÒÒ‡ÊËÓ‚: ";
-        cin >> passenger_count;
-        BinaryProcessor::FillWithRandomLuggage(filename, passenger_count);
-        break;
-      }
-      case 2:
-        BinaryProcessor::DisplayLuggage(filename);
-        break;
-      case 3:
-        BinaryProcessor::Task3FindMassDifference(filename);
-        break;
-      case 4:
-        BinaryProcessor::CreateTestLuggageFile(filename);
-        break;
-      default:
-        cout << "ÕÂ‚ÂÌ˚È ‚˚·Ó!" << endl;
+        switch (choice) {
+        case 1: {
+            int passenger_count;
+            cout << "–ö–æ–ª–∏—á–µ—Å—Ç–≤–æ –ø–∞—Å—Å–∞–∂–∏—Ä–æ–≤: ";
+            cin >> passenger_count;
+            BinaryProcessor::FillWithRandomLuggage(filename, passenger_count);
+            break;
+        }
+        case 2:
+            BinaryProcessor::DisplayLuggage(filename);
+            break;
+        case 3:
+            BinaryProcessor::Task3FindMassDifference(filename);
+            break;
+        case 4:
+            BinaryProcessor::CreateTestLuggageFile(filename);
+            break;
+        default:
+            cout << "–ù–µ–≤–µ—Ä–Ω—ã–π –≤—ã–±–æ—Ä!" << endl;
+        }
     }
-  }
 }
 
 void TextFileMenu() {
-  string filename;
-  cout << "¬‚Â‰ËÚÂ ËÏˇ ÚÂÍÒÚÓ‚Ó„Ó Ù‡ÈÎ‡ (Ó‰ÌÓ ˜ËÒÎÓ ‚ ÒÚÓÍÂ): ";
-  cin >> filename;
+    string filename;
+    cout << "–í–≤–µ–¥–∏—Ç–µ –∏–º—è —Ç–µ–∫—Å—Ç–æ–≤–æ–≥–æ —Ñ–∞–π–ª–∞ (–æ–¥–Ω–æ —á–∏—Å–ª–æ –≤ —Å—Ç—Ä–æ–∫–µ): ";
+    cin >> filename;
 
-  while (true) {
-    cout << "\n=== Ã≈Õﬁ “≈ —“Œ¬€’ ƒ¿ÕÕ€’ (Ó‰ÌÓ ˜ËÒÎÓ ‚ ÒÚÓÍÂ) ===" << endl;
-    cout << "1. «‡ÔÓÎÌËÚ¸ Ù‡ÈÎ ÒÎÛ˜‡ÈÌ˚ÏË ˜ËÒÎ‡ÏË" << endl;
-    cout << "2. œÓÍ‡Á‡Ú¸ ÒÓ‰ÂÊËÏÓÂ Ù‡ÈÎ‡" << endl;
-    cout << "3. «‡‰‡ÌËÂ 4 - ÔÓ‚ÂÍ‡ ÓÚÒÛÚÒÚ‚Ëˇ ÌÛÎˇ" << endl;
-    cout << "4. —ÓÁ‰‡Ú¸ ÚÂÒÚÓ‚˚È Ù‡ÈÎ" << endl;
-    cout << "0. Õ‡Á‡‰" << endl;
-    cout << "¬˚·Ó: ";
+    while (true) {
+        cout << "\n=== –ú–ï–ù–Æ –¢–ï–ö–°–¢–û–í–´–• –î–ê–ù–ù–´–• (–æ–¥–Ω–æ —á–∏—Å–ª–æ –≤ —Å—Ç—Ä–æ–∫–µ) ===" << endl;
+        cout << "1. –ó–∞–ø–æ–ª–Ω–∏—Ç—å —Ñ–∞–π–ª —Å–ª—É—á–∞–π–Ω—ã–º–∏ —á–∏—Å–ª–∞–º–∏" << endl;
+        cout << "2. –ü–æ–∫–∞–∑–∞—Ç—å —Å–æ–¥–µ—Ä–∂–∏–º–æ–µ —Ñ–∞–π–ª–∞" << endl;
+        cout << "3. –ó–∞–¥–∞–Ω–∏–µ 4 - –ø—Ä–æ–≤–µ—Ä–∫–∞ –æ—Ç—Å—É—Ç—Å—Ç–≤–∏—è –Ω—É–ª—è" << endl;
+        cout << "4. –°–æ–∑–¥–∞—Ç—å —Ç–µ—Å—Ç–æ–≤—ã–π —Ñ–∞–π–ª" << endl;
+        cout << "0. –ù–∞–∑–∞–¥" << endl;
+        cout << "–í—ã–±–æ—Ä: ";
 
-    int choice;
-    cin >> choice;
+        int choice;
+        cin >> choice;
 
-    if (choice == 0) break;
+        if (choice == 0) break;
 
-    switch (choice) {
-      case 1: {
-        int count, min_val, max_val;
-        cout << " ÓÎË˜ÂÒÚ‚Ó ˜ËÒÂÎ: ";
-        cin >> count;
-        cout << "ÃËÌËÏÛÏ: ";
-        cin >> min_val;
-        cout << "Ã‡ÍÒËÏÛÏ: ";
-        cin >> max_val;
-        BinaryProcessor::FillTextFileWithRandomNumbers(filename, count, min_val,
-                                                       max_val);
-        break;
-      }
-      case 2:
-        BinaryProcessor::DisplayTextFileContent(filename);
-        break;
-      case 3:
-        BinaryProcessor::Task4CheckNoZero(filename);
-        break;
-      case 4:
-        BinaryProcessor::CreateTestTextFile(filename);
-        break;
-      default:
-        cout << "ÕÂ‚ÂÌ˚È ‚˚·Ó!" << endl;
+        switch (choice) {
+        case 1: {
+            int count, min_val, max_val;
+            cout << "–ö–æ–ª–∏—á–µ—Å—Ç–≤–æ —á–∏—Å–µ–ª: ";
+            cin >> count;
+            cout << "–ú–∏–Ω–∏–º—É–º: ";
+            cin >> min_val;
+            cout << "–ú–∞–∫—Å–∏–º—É–º: ";
+            cin >> max_val;
+            BinaryProcessor::FillTextFileWithRandomNumbers(filename, count, min_val, max_val);
+            break;
+        }
+        case 2:
+            BinaryProcessor::DisplayTextFileContent(filename);
+            break;
+        case 3:
+            BinaryProcessor::Task4CheckNoZero(filename);
+            break;
+        case 4:
+            BinaryProcessor::CreateTestTextFile(filename);
+            break;
+        default:
+            cout << "–ù–µ–≤–µ—Ä–Ω—ã–π –≤—ã–±–æ—Ä!" << endl;
+        }
     }
-  }
 }
 
 void TextFileMultipleMenu() {
-  string filename;
-  cout << "¬‚Â‰ËÚÂ ËÏˇ ÚÂÍÒÚÓ‚Ó„Ó Ù‡ÈÎ‡ (ÌÂÒÍÓÎ¸ÍÓ ˜ËÒÂÎ ‚ ÒÚÓÍÂ): ";
-  cin >> filename;
+    string filename;
+    cout << "–í–≤–µ–¥–∏—Ç–µ –∏–º—è —Ç–µ–∫—Å—Ç–æ–≤–æ–≥–æ —Ñ–∞–π–ª–∞ (–Ω–µ—Å–∫–æ–ª—å–∫–æ —á–∏—Å–µ–ª –≤ —Å—Ç—Ä–æ–∫–µ): ";
+    cin >> filename;
 
-  while (true) {
-    cout << "\n=== Ã≈Õﬁ “≈ —“Œ¬€’ ƒ¿ÕÕ€’ (ÌÂÒÍÓÎ¸ÍÓ ˜ËÒÂÎ ‚ ÒÚÓÍÂ) ==="
-         << endl;
-    cout << "1. «‡ÔÓÎÌËÚ¸ Ù‡ÈÎ ÒÎÛ˜‡ÈÌ˚ÏË ˜ËÒÎ‡ÏË" << endl;
-    cout << "2. œÓÍ‡Á‡Ú¸ ÒÓ‰ÂÊËÏÓÂ Ù‡ÈÎ‡" << endl;
-    cout << "3. «‡‰‡ÌËÂ 5 - Ì‡ÈÚË Ï‡ÍÒËÏ‡Î¸Ì˚È ˝ÎÂÏÂÌÚ" << endl;
-    cout << "4. —ÓÁ‰‡Ú¸ ÚÂÒÚÓ‚˚È Ù‡ÈÎ" << endl;
-    cout << "0. Õ‡Á‡‰" << endl;
-    cout << "¬˚·Ó: ";
+    while (true) {
+        cout << "\n=== –ú–ï–ù–Æ –¢–ï–ö–°–¢–û–í–´–• –î–ê–ù–ù–´–• (–Ω–µ—Å–∫–æ–ª—å–∫–æ —á–∏—Å–µ–ª –≤ —Å—Ç—Ä–æ–∫–µ) ===" << endl;
+        cout << "1. –ó–∞–ø–æ–ª–Ω–∏—Ç—å —Ñ–∞–π–ª —Å–ª—É—á–∞–π–Ω—ã–º–∏ —á–∏—Å–ª–∞–º–∏" << endl;
+        cout << "2. –ü–æ–∫–∞–∑–∞—Ç—å —Å–æ–¥–µ—Ä–∂–∏–º–æ–µ —Ñ–∞–π–ª–∞" << endl;
+        cout << "3. –ó–∞–¥–∞–Ω–∏–µ 5 - –Ω–∞–π—Ç–∏ –º–∞–∫—Å–∏–º–∞–ª—å–Ω—ã–π —ç–ª–µ–º–µ–Ω—Ç" << endl;
+        cout << "4. –°–æ–∑–¥–∞—Ç—å —Ç–µ—Å—Ç–æ–≤—ã–π —Ñ–∞–π–ª" << endl;
+        cout << "0. –ù–∞–∑–∞–¥" << endl;
+        cout << "–í—ã–±–æ—Ä: ";
 
-    int choice;
-    cin >> choice;
+        int choice;
+        cin >> choice;
 
-    if (choice == 0) break;
+        if (choice == 0) break;
 
-    switch (choice) {
-      case 1: {
-        int total_count, numbers_per_line, min_val, max_val;
-        cout << "Œ·˘ÂÂ ÍÓÎË˜ÂÒÚ‚Ó ˜ËÒÂÎ: ";
-        cin >> total_count;
-        cout << " ÓÎË˜ÂÒÚ‚Ó ˜ËÒÂÎ ‚ ÒÚÓÍÂ: ";
-        cin >> numbers_per_line;
-        cout << "ÃËÌËÏÛÏ: ";
-        cin >> min_val;
-        cout << "Ã‡ÍÒËÏÛÏ: ";
-        cin >> max_val;
-        BinaryProcessor::FillTextFileWithRandomNumbersMultiplePerLine(
-            filename, total_count, numbers_per_line, min_val, max_val);
-        break;
-      }
-      case 2:
-        BinaryProcessor::DisplayTextFileContentMultiplePerLine(filename);
-        break;
-      case 3:
-        BinaryProcessor::Task5FindMaxElement(filename);
-        break;
-      case 4:
-        BinaryProcessor::CreateTestTextFileMultiplePerLine(filename);
-        break;
-      default:
-        cout << "ÕÂ‚ÂÌ˚È ‚˚·Ó!" << endl;
+        switch (choice) {
+        case 1: {
+            int total_count, numbers_per_line, min_val, max_val;
+            cout << "–û–±—â–µ–µ –∫–æ–ª–∏—á–µ—Å—Ç–≤–æ —á–∏—Å–µ–ª: ";
+            cin >> total_count;
+            cout << "–ö–æ–ª–∏—á–µ—Å—Ç–≤–æ —á–∏—Å–µ–ª –≤ —Å—Ç—Ä–æ–∫–µ: ";
+            cin >> numbers_per_line;
+            cout << "–ú–∏–Ω–∏–º—É–º: ";
+            cin >> min_val;
+            cout << "–ú–∞–∫—Å–∏–º—É–º: ";
+            cin >> max_val;
+            BinaryProcessor::FillTextFileWithRandomNumbersMultiplePerLine(
+                filename, total_count, numbers_per_line, min_val, max_val);
+            break;
+        }
+        case 2:
+            BinaryProcessor::DisplayTextFileContentMultiplePerLine(filename);
+            break;
+        case 3:
+            BinaryProcessor::Task5FindMaxElement(filename);
+            break;
+        case 4:
+            BinaryProcessor::CreateTestTextFileMultiplePerLine(filename);
+            break;
+        default:
+            cout << "–ù–µ–≤–µ—Ä–Ω—ã–π –≤—ã–±–æ—Ä!" << endl;
+        }
     }
-  }
 }
 
 void TextFileStringsMenu() {
-  string filename;
-  cout << "¬‚Â‰ËÚÂ ËÏˇ ÚÂÍÒÚÓ‚Ó„Ó Ù‡ÈÎ‡ (ÒÚÓÍË): ";
-  cin >> filename;
+    string filename;
+    cout << "–í–≤–µ–¥–∏—Ç–µ –∏–º—è —Ç–µ–∫—Å—Ç–æ–≤–æ–≥–æ —Ñ–∞–π–ª–∞ (—Å—Ç—Ä–æ–∫–∏): ";
+    cin >> filename;
 
-  while (true) {
-    cout << "\n=== Ã≈Õﬁ “≈ —“Œ¬€’ ƒ¿ÕÕ€’ (ÒÚÓÍË) ===" << endl;
-    cout << "1. «‡ÔÓÎÌËÚ¸ Ù‡ÈÎ ÒÎÛ˜‡ÈÌ˚ÏË ÒÚÓÍ‡ÏË" << endl;
-    cout << "2. œÓÍ‡Á‡Ú¸ ÒÓ‰ÂÊËÏÓÂ Ù‡ÈÎ‡" << endl;
-    cout << "3. «‡‰‡ÌËÂ 6 - ÍÓÔËÓ‚‡Ú¸ ÒÚÓÍË, ÓÍ‡Ì˜Ë‚‡˛˘ËÂÒˇ Ì‡ ÒËÏ‚ÓÎ"
-         << endl;
-    cout << "4. —ÓÁ‰‡Ú¸ ÚÂÒÚÓ‚˚È Ù‡ÈÎ" << endl;
-    cout << "0. Õ‡Á‡‰" << endl;
-    cout << "¬˚·Ó: ";
+    while (true) {
+        cout << "\n=== –ú–ï–ù–Æ –¢–ï–ö–°–¢–û–í–´–• –î–ê–ù–ù–´–• (—Å—Ç—Ä–æ–∫–∏) ===" << endl;
+        cout << "1. –ó–∞–ø–æ–ª–Ω–∏—Ç—å —Ñ–∞–π–ª —Å–ª—É—á–∞–π–Ω—ã–º–∏ —Å—Ç—Ä–æ–∫–∞–º–∏" << endl;
+        cout << "2. –ü–æ–∫–∞–∑–∞—Ç—å —Å–æ–¥–µ—Ä–∂–∏–º–æ–µ —Ñ–∞–π–ª–∞" << endl;
+        cout << "3. –ó–∞–¥–∞–Ω–∏–µ 6 - –∫–æ–ø–∏—Ä–æ–≤–∞—Ç—å —Å—Ç—Ä–æ–∫–∏, –æ–∫–∞–Ω—á–∏–≤–∞—é—â–∏–µ—Å—è –Ω–∞ —Å–∏–º–≤–æ–ª" << endl;
+        cout << "4. –°–æ–∑–¥–∞—Ç—å —Ç–µ—Å—Ç–æ–≤—ã–π —Ñ–∞–π–ª" << endl;
+        cout << "0. –ù–∞–∑–∞–¥" << endl;
+        cout << "–í—ã–±–æ—Ä: ";
 
-    int choice;
-    cin >> choice;
+        int choice;
+        cin >> choice;
 
-    if (choice == 0) break;
+        if (choice == 0) break;
 
-    switch (choice) {
-      case 1: {
-        int line_count;
-        cout << " ÓÎË˜ÂÒÚ‚Ó ÒÚÓÍ: ";
-        cin >> line_count;
-        BinaryProcessor::FillTextFileWithRandomStrings(filename, line_count);
-        break;
-      }
-      case 2:
-        BinaryProcessor::DisplayTextFileLines(filename);
-        break;
-      case 3: {
-        string output_filename;
-        char ending_char;
-        cout << "¬‚Â‰ËÚÂ ËÏˇ ‚˚ıÓ‰ÌÓ„Ó Ù‡ÈÎ‡: ";
-        cin >> output_filename;
-        cout << "¬‚Â‰ËÚÂ ÒËÏ‚ÓÎ ‰Îˇ ÙËÎ¸Ú‡ˆËË: ";
-        cin >> ending_char;
-        BinaryProcessor::Task6CopyLinesEndingWithChar(filename, output_filename,
-                                                      ending_char);
-        break;
-      }
-      case 4:
-        BinaryProcessor::CreateTestTextFileWithStrings(filename);
-        break;
-      default:
-        cout << "ÕÂ‚ÂÌ˚È ‚˚·Ó!" << endl;
+        switch (choice) {
+        case 1: {
+            int line_count;
+            cout << "–ö–æ–ª–∏—á–µ—Å—Ç–≤–æ —Å—Ç—Ä–æ–∫: ";
+            cin >> line_count;
+            BinaryProcessor::FillTextFileWithRandomStrings(filename, line_count);
+            break;
+        }
+        case 2:
+            BinaryProcessor::DisplayTextFileLines(filename);
+            break;
+        case 3: {
+            string output_filename;
+            char ending_char;
+            cout << "–í–≤–µ–¥–∏—Ç–µ –∏–º—è –≤—ã—Ö–æ–¥–Ω–æ–≥–æ —Ñ–∞–π–ª–∞: ";
+            cin >> output_filename;
+            cout << "–í–≤–µ–¥–∏—Ç–µ —Å–∏–º–≤–æ–ª –¥–ª—è —Ñ–∏–ª—å—Ç—Ä–∞—Ü–∏–∏: ";
+            cin >> ending_char;
+            BinaryProcessor::Task6CopyLinesEndingWithChar(filename, output_filename, ending_char);
+            break;
+        }
+        case 4:
+            BinaryProcessor::CreateTestTextFileWithStrings(filename);
+            break;
+        default:
+            cout << "–ù–µ–≤–µ—Ä–Ω—ã–π –≤—ã–±–æ—Ä!" << endl;
+        }
     }
-  }
 }
 
 int main() {
-  SetRussianLocale();
+    SetRussianLocale();
 
-  cout << "œ–Œ√–¿ÃÃ¿ ƒÀﬂ –¿¡Œ“€ — ‘¿…À¿Ã»" << endl;
-  cout << "«‡‰‡ÌËˇ 1-6 ‚ Ó‰ÌÓÏ ÍÎ‡ÒÒÂ ÒÓ ÒÚ‡ÚË˜ÂÒÍËÏË ÏÂÚÓ‰‡ÏË" << endl;
+    cout << "–ü–†–û–ì–†–ê–ú–ú–ê –î–õ–Ø –†–ê–ë–û–¢–´ –° –§–ê–ô–õ–ê–ú–ò" << endl;
+    cout << "–ó–∞–¥–∞–Ω–∏—è 1-6 –≤ –æ–¥–Ω–æ–º –∫–ª–∞—Å—Å–µ —Å–æ —Å—Ç–∞—Ç–∏—á–µ—Å–∫–∏–º–∏ –º–µ—Ç–æ–¥–∞–º–∏" << endl;
 
-  while (true) {
-    ShowMenu();
-    int choice;
-    cin >> choice;
+    while (true) {
+        ShowMenu();
+        int choice;
+        cin >> choice;
 
-    if (choice == 0) break;
+        if (choice == 0) break;
 
-    switch (choice) {
-      case 1:
-        NumbersMenu();
-        break;
-      case 2:
-        LuggageMenu();
-        break;
-      case 3:
-        TextFileMenu();
-        break;
-      case 4:
-        TextFileMultipleMenu();
-        break;
-      case 5:
-        TextFileStringsMenu();
-        break;
-      default:
-        cout << "ÕÂ‚ÂÌ˚È ‚˚·Ó!" << endl;
+        switch (choice) {
+        case 1:
+            NumbersMenu();
+            break;
+        case 2:
+            LuggageMenu();
+            break;
+        case 3:
+            TextFileMenu();
+            break;
+        case 4:
+            TextFileMultipleMenu();
+            break;
+        case 5:
+            TextFileStringsMenu();
+            break;
+        default:
+            cout << "–ù–µ–≤–µ—Ä–Ω—ã–π –≤—ã–±–æ—Ä!" << endl;
+        }
     }
-  }
 
-  cout << "¬˚ıÓ‰ ËÁ ÔÓ„‡ÏÏ˚." << endl;
-  return 0;
+    cout << "–í—ã—Ö–æ–¥ –∏–∑ –ø—Ä–æ–≥—Ä–∞–º–º—ã." << endl;
+    return 0;
 }
